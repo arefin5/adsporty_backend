@@ -21,4 +21,4 @@ COPY . .
 EXPOSE 3001
 
 # Start the app
-CMD ["npm", "server.js"]
+CMD ["npm", "start"]
