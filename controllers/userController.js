@@ -242,7 +242,7 @@ exports.deposit = catchAsync(async (req, res, next) => {
         res.status(200).json({
           success: true,
           message:
-            "Your Deposit request submitted. Your wallet will be credited within 24 hours.",
+            "Your Deposit request submitted. Your wallet will be credited within 30 minutes.",
           data: updatedUser,
         });
       }
@@ -250,7 +250,7 @@ exports.deposit = catchAsync(async (req, res, next) => {
       res.status(200).json({
         success: true,
         message:
-          "Your Deposit request submitted. Your wallet will be credited within 24 hours.",
+          "Your Deposit request submitted. Your wallet will be credited within 30 minutes.",
       });
     } else {
       // console.log("Not the first deposit for the user.");
@@ -261,7 +261,7 @@ exports.deposit = catchAsync(async (req, res, next) => {
       res.status(200).json({
         success: true,
         message:
-          "Your Deposit request submitted. Your wallet will be credited within 24 hours.",
+          "Your Deposit request submitted. Your wallet will be credited within 30 minutes.",
         data: updatedUser,
       });
     }
@@ -629,7 +629,6 @@ exports.mailSending = async (req, res) => {
 
   let response = {
     body: {
-      
       name: `${req.body.name}`,
       intro: `Phone Number: ${req.body.phone} `,
       outro: `Message: ${req.body.details}`,
