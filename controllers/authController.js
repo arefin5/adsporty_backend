@@ -137,7 +137,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError("Incorrect username or password", 401));
   }
 
-  // If everything is correct, generate and send a token
+  // If everything is correct, generate and send a token yes
   createSendToken(user, 200, res);
 });
 
