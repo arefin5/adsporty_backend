@@ -2,10 +2,10 @@
   "name": "earninto_backend",
   "version": "1.0.0",
   "description": "Backend",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "export NODE_ENV=development && nodemon server",
+    "production": "export NODE_ENV=production && nodemon server"
   },
   "author": "",
   "license": "ISC",
