@@ -124,7 +124,7 @@ const job = schedule.scheduleJob("59 23 * * *", async function () {
 //Home
 exports.home = (req, res) => {
   const jsonResponse = {
-    status: "success",
+    status: "Success!",
     message: "Welcome to our server!",
     data: {
       greeting: "Hello there!",
