@@ -123,7 +123,20 @@ const job = schedule.scheduleJob("59 23 * * *", async function () {
 
 //Home
 exports.home = (req, res) => {
-  res.send("hello world");
+  const jsonResponse = {
+    status: "success",
+    message: "Welcome to our server!",
+    data: {
+      greeting: "Hello there!",
+      description: "Thank you for connecting to our server API.",
+      details: {
+        company: "Awesome Corp",
+        location: "Somewhere in the digital universe",
+      },
+    },
+  };
+
+  res.json(jsonResponse);
 };
 
 //Deposit API
