@@ -109,7 +109,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 //Login
 exports.login = catchAsync(async (req, res, next) => {
   const { username, password } = req.body;
-  console.log(username, password);
+  // console.log(username, password);
 
   // Check if username and password were provided
   if (!username || !password) {
@@ -117,13 +117,25 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // // Find the user by username
-  const user = await User.findOne({
-    "userinformation.username": username,
-  }).select("+userinformation.password");
+  // const user = await User.findOne({
+  //   "userinformation.username": username,
+  // }).select("+userinformation.password");
 
-  // console.log("user", user);
+  let user;
+  if (username) {
+    user = await User.findOne({
+      $or: [
+        { "userinformation.username": username },
+        { "userinformation.phonenumber": username },
+      ],
+    }).select("+userinformation.password");
+  } else if (phoneNumber) {
+    user = await User.findOne({
+      "userinformation.phonenumber": phoneNumber,
+    }).select("+userinformation.password");
+  }
 
-  // // Check if user exists
+  // Check if user exists
   if (!user) {
     return next(new AppError("Incorrect username or password", 401));
   }

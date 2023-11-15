@@ -16,16 +16,18 @@ const handleCastErrorDB = (err) => {
 };
 
 const handleDuplicateFieldsDB = (err) => {
-  const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
-
-  const message = `Duplicate field value: ${value}. Please use another value!`;
+  const duplicateValue = err.keyValue["userinformation.username"];
+  const message = `Username or Phonenumber is already used. Try another.`;
   return new AppError(message, 400);
 };
 
 const handleValidationErrorDB = (err) => {
+  // console.log(err);
   const errors = Object.values(err.errors).map((el) => el.message);
+  // console.log(errors);
 
   const message = `Invalid input data. ${errors.join(". ")}`;
+  // console.log(message);
   return new AppError(message, 400);
 };
 
@@ -72,18 +74,11 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || "error";
 
   if (process.env.NODE_ENV === "development") {
-    let error = { ...err };
-
-    if (error.name === "CastError") error = handleCastErrorDB(error);
-    if (error.code === 11000) error = handleDuplicateFieldsDB(error);
-    if (error.name === "ValidationError")
-      error = handleValidationErrorDB(error);
-    if (error.name === "JsonWebTokenError") error = handleJWTError();
-    if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
-
-    sendErrorProd(error, res);
+    sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === "production") {
     let error = { ...err };
+
+    // console.log("error", error, error.name);
 
     if (error.name === "CastError") error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
@@ -95,18 +90,3 @@ module.exports = (err, req, res, next) => {
     sendErrorProd(error, res);
   }
 };
-//   if (process.env.NODE_ENV === "development") {
-//     sendErrorDev(err, res);
-//   } else if (process.env.NODE_ENV === "production") {
-//     let error = { ...err };
-
-//     if (error.name === "CastError") error = handleCastErrorDB(error);
-//     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
-//     if (error.name === "ValidationError")
-//       error = handleValidationErrorDB(error);
-//     if (error.name === "JsonWebTokenError") error = handleJWTError();
-//     if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
-
-//     sendErrorProd(error, res);
-//   }
-// };
