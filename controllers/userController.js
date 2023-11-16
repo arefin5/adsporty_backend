@@ -124,7 +124,7 @@ const job = schedule.scheduleJob("59 23 * * *", async function () {
 //Home
 exports.home = (req, res) => {
   const jsonResponse = {
-    status: "Successfull",
+    status: "Successfully Running!",
     message: "Welcome to our server!",
     data: {
       greeting: "Hello there!",
@@ -708,6 +708,18 @@ exports.calculateAdsRevenue = catchAsync(async (req, res) => {
     current_ad_rate: ads_percentage_rate,
   };
 
+  // if (user.trackAdRevenue.length === 0) {
+  //   user.trackAdRevenue.push(newAdRevenue);
+  // } else {
+  //   const existingAdRevenue = user.trackAdRevenue.find(
+  //     (revenue) => revenue.date === todaysDate
+  //   );
+
+  //   if (!existingAdRevenue) {
+  //     user.trackAdRevenue.push(newAdRevenue);
+  //   }
+  // }
+
   if (user.trackAdRevenue.length === 0) {
     user.trackAdRevenue.push(newAdRevenue);
   } else {
@@ -717,6 +729,8 @@ exports.calculateAdsRevenue = catchAsync(async (req, res) => {
 
     if (!existingAdRevenue) {
       user.trackAdRevenue.push(newAdRevenue);
+    } else if (existingAdRevenue.revenue === "0.00") {
+      existingAdRevenue.revenue = ad_revenue;
     }
   }
 
