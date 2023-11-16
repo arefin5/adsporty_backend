@@ -124,7 +124,7 @@ const job = schedule.scheduleJob("59 23 * * *", async function () {
 //Home
 exports.home = (req, res) => {
   const jsonResponse = {
-    status: "Successfully Running!",
+    status: "Ready to serve data",
     message: "Welcome to our server!",
     data: {
       greeting: "Hello there!",
@@ -729,8 +729,18 @@ exports.calculateAdsRevenue = catchAsync(async (req, res) => {
 
     if (!existingAdRevenue) {
       user.trackAdRevenue.push(newAdRevenue);
+      await user.save();
     } else if (existingAdRevenue.revenue === "0.00") {
       existingAdRevenue.revenue = ad_revenue;
+      existingAdRevenue.current_ad_wallet_balance =
+        user_ads_wallet_balance.toFixed(2);
+      existingAdRevenue.current_ad_rate = ads_percentage_rate;
+
+      await User.findOneAndUpdate(
+        { _id: userId },
+        { $set: { trackAdRevenue: user.trackAdRevenue } },
+        { new: true }
+      );
     }
   }
 
