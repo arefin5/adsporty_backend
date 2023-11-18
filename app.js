@@ -5,6 +5,8 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
+var Fingerprint = require("express-fingerprint");
+const requestIp = require("request-ip");
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
@@ -13,6 +15,44 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
+
+// Use request-ip middleware to get client's IP address
+app.use(requestIp.mw());
+
+// Use the express-fingerprint middleware
+app.use(
+  Fingerprint({
+    parameters: [
+      // Defaults
+      Fingerprint.useragent,
+      Fingerprint.acceptHeaders,
+      Fingerprint.geoip,
+
+      // Additional parameters
+      function (next) {
+        // ...do something...
+        next(null, {
+          param1: "value1",
+        });
+      },
+      function (next) {
+        // ...do something...
+        next(null, {
+          param2: "value2",
+        });
+      },
+    ],
+  })
+);
+
+// Endpoint to get device fingerprint
+app.get("/fingerprint", (req, res) => {
+  const fingerprint = req.fingerprint;
+  const clientIp = req.clientIp;
+  // console.log("Fingerprint:", fingerprint);
+  // console.log("Client IP:", clientIp);
+  res.json({ fingerprint, clientIp });
+});
 
 const corsOptions = {
   origin: "*",
