@@ -549,12 +549,9 @@ exports.getPendingWithdrawTransactions = catchAsync(async (req, res, next) => {
 
 // Admin approves or rejects a transaction
 exports.approveTransaction = catchAsync(async (req, res, next) => {
-  // console.log(req.body)
   const { action, userId, transactionId } = req.body;
-  // console.log(action, userId, transactionId);
 
   const user = await User.findById(userId);
-  // console.log(user)
   if (!user) {
     return next(new AppError("User not found", 404));
   }
@@ -563,14 +560,9 @@ exports.approveTransaction = catchAsync(async (req, res, next) => {
     (t) => t.trx_id === transactionId
   );
 
-  // console.log(transaction);
-
   if (!transaction) {
     return next(new AppError("Transaction not found", 404));
   }
-
-  // User validation failed: ads_wallet.balance: Cast to Number failed
-  //  for value "NaN" (type number) at path "ads_wallet.balance"
 
   let newTransactionStatus;
   let newNotfication;
@@ -593,7 +585,6 @@ exports.approveTransaction = catchAsync(async (req, res, next) => {
     const notificationID = uuid.v4();
 
     if (transaction.transaction_type === "deposit") {
-      // console.log(getDate(), getTime(), "602 date and time");
       newNotfication = {
         id: notificationID,
         date: formattedDate,
@@ -623,6 +614,68 @@ exports.approveTransaction = catchAsync(async (req, res, next) => {
     user.notifications.push(newNotfication);
 
     await user.save();
+
+    let firstDepositTransaction;
+    if (user.transactionHistory.length === 0 || "undefined")
+      firstDepositTransaction = true;
+
+    const referrerReferralID = user.userinformation.referrerReferralID;
+
+    if (firstDepositTransaction && referrerReferralID) {
+      const referrerUser = await User.findOne({
+        "userinformation.referralID": referrerReferralID,
+      });
+
+      if (!referrerUser) {
+        return next(new AppError("Refferer User not found", 404));
+      }
+
+      const Bonus = parseFloat(transaction.amount) * 0.1;
+
+      // Update the fields without using save()
+      const updatedReferrerUser = await User.findOneAndUpdate(
+        { _id: referrerUser._id },
+        {
+          $inc: {
+            "ads_wallet.balance": Bonus,
+            totalEarnings: Bonus,
+            totalReferralEarnings: Bonus,
+          },
+          $set: {
+            "todaysEarning.earning_from_referral": Bonus,
+          },
+        },
+        { new: true } // This option returns the updated document
+      );
+
+      if (!updatedReferrerUser) {
+        return next(new AppError("Referrer User not found", 404));
+      }
+
+      const newReffererUserTransaction = {
+        date: formattedDate,
+        selected_wallet: "ads_wallet",
+        amount: Bonus,
+        payment_method: "",
+        payment_phone_number: "",
+        trx_id: "",
+        transaction_status: "approved",
+        transaction_type: "Refferal Received",
+      };
+
+      referrerUser.transactionHistory.push(newReffererUserTransaction);
+      try {
+        await referrerUser.save();
+      } catch (error) {
+        // Log the error if the save operation fails
+        console.error("Error saving user:", error);
+      }
+
+      const informationDB = await UploadAdmin.find();
+      informationDB[0].total_reffered_balance += Bonus;
+
+      await informationDB[0].save();
+    }
   } else if (action === "reject") {
     const notificationID = uuid.v4();
 
