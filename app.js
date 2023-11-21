@@ -20,6 +20,7 @@ const app = express();
 app.use(requestIp.mw());
 
 // Use the express-fingerprint middleware
+
 app.use(
   Fingerprint({
     parameters: [
@@ -27,32 +28,9 @@ app.use(
       Fingerprint.useragent,
       Fingerprint.acceptHeaders,
       Fingerprint.geoip,
-
-      // Additional parameters
-      function (next) {
-        // ...do something...
-        next(null, {
-          param1: "value1",
-        });
-      },
-      function (next) {
-        // ...do something...
-        next(null, {
-          param2: "value2",
-        });
-      },
     ],
   })
 );
-
-// Endpoint to get device fingerprint
-app.get("/fingerprint", (req, res) => {
-  const fingerprint = req.fingerprint;
-  const clientIp = req.clientIp;
-  // console.log("Fingerprint:", fingerprint);
-  // console.log("Client IP:", clientIp);
-  res.json({ fingerprint, clientIp });
-});
 
 const corsOptions = {
   origin: "*",
@@ -63,6 +41,13 @@ app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
+});
+
+// Endpoint to get device fingerprint
+app.get("/fingerprint", (req, res) => {
+  const fingerprint = req.fingerprint;
+  const clientIp = req.clientIp;
+  res.json({ fingerprint, clientIp });
 });
 
 // 1) GLOBAL MIDDLEWARES
