@@ -83,7 +83,6 @@ exports.signup = catchAsync(async (req, res, next) => {
     "deviceInformations.deviceHash": deviceHash,
   });
 
-
   if (existingUser) {
     return next(
       new AppError("User with this device information already exists.", 400)
