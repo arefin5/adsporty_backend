@@ -14,6 +14,10 @@ const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}.`;
   return new AppError(message, 400);
 };
+const handleNotFoundError = (err) => {
+  const message = `User with this device information already exists.`;
+  return new AppError(message, 400);
+};
 
 const handleDuplicateFieldsDB = (err) => {
   const duplicateValue = err.keyValue["userinformation.username"];
@@ -75,13 +79,12 @@ module.exports = (err, req, res, next) => {
 
   let error = { ...err };
 
-  // console.log("error", error, error.name);
-
   if (error.name === "CastError") error = handleCastErrorDB(error);
   if (error.code === 11000) error = handleDuplicateFieldsDB(error);
   if (error.name === "ValidationError") error = handleValidationErrorDB(error);
   if (error.name === "JsonWebTokenError") error = handleJWTError();
   if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
+  if (error.statusCode === 400) error = handleNotFoundError(error);
 
   sendErrorProd(error, res);
 };

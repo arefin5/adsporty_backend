@@ -77,7 +77,19 @@ exports.signup = catchAsync(async (req, res, next) => {
     geoIP,
     userAgent,
   } = req.body;
-  console.log(req.body);
+
+  const existingUser = await User.findOne({
+    "deviceInformations.clientIP": clientIP,
+    "deviceInformations.deviceHash": deviceHash,
+  });
+
+
+  if (existingUser) {
+    return next(
+      new AppError("User with this device information already exists.", 400)
+    );
+  }
+
   // console.log(name, username, phonenumber, referralID, password);
 
   // Generate a random short ID with a maximum length of 5 characters
