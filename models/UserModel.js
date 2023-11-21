@@ -54,6 +54,7 @@ const userSchema = new mongoose.Schema({
       default: false,
     },
   },
+  deviceInformations: {},
   games_wallet: {
     balance: {
       type: Number,

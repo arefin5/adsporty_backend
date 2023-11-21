@@ -124,7 +124,7 @@ const job = schedule.scheduleJob("59 23 * * *", async function () {
 //Home
 exports.home = (req, res) => {
   const jsonResponse = {
-    status: "Ready to serve data with ip",
+    status: "Ready to serve data to store ip",
     message: "Welcome to our server!",
     data: {
       greeting: "Hello there!",
