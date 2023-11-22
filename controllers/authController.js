@@ -65,7 +65,6 @@ async function isShortIDUnique(shortID) {
 
 //SignUp
 exports.signup = catchAsync(async (req, res, next) => {
-  // console.log(req.body);
   const {
     name,
     username,
@@ -75,8 +74,12 @@ exports.signup = catchAsync(async (req, res, next) => {
     clientIP,
     deviceHash,
     geoIP,
-    userAgent,
+    // userAgent,
   } = req.body;
+
+  // console.log(req);
+  const userAgent = req.headers["user-agent"];
+  // console.log(userAgent);
 
   const existingUser = await User.findOne({
     "deviceInformations.clientIP": clientIP,
